@@ -26,10 +26,10 @@ public class CreateBrandCommand : IRequest<CreatedBrandResponse>
 
             await _brandRepository.AddAsync(brand);
 
-            CreatedBrandResponse createdBrandResponse =
+            CreatedBrandResponse response =
                 _mapper.Map<CreatedBrandResponse>(brand);
 
-            return createdBrandResponse;
+            return response;
         }
     }
 }
