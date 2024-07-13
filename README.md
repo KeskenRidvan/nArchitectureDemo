@@ -1,6 +1,6 @@
 # Course Name: C# .NET Core Clean Architecture & CQRS Project Infrastructure Course
 
-## What I learned in couse 1:
+## What I learned at the end of the 5-hour course-1:
 
 - DDD-oriented Clean Architecture Implementation
 - CQRS (Command Query Responsibility Segregeation)
@@ -11,4 +11,15 @@
 - Advanced and best practice oriented Entity Framework Implementation 
 - API Implementation 
 - Extension writing techniques
+
+## What I learned at the end of the 3,5-hour course-2:
+
+- Multiple and related domain modeling
+- Advanced Mapping Implementation
+- Migration Implementation
+- Business Rules and Clean Code Writing Techniques
+- Global Error Management
+- Pipeline Writing Techniques
+- Fluent Validation Implementation with Validation Pipeline
+- Transactional Operation Implementation with Transaction Pipeline
 <hr/>
