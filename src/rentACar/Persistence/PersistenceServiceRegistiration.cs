@@ -13,6 +13,10 @@ public static class PersistenceServiceRegistiration
         services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("Eng.nArchitecture"));
 
         services.AddScoped<IBrandRepository, BrandRepository>();
+        services.AddScoped<ICarRepository, CarRepository>();
+        services.AddScoped<IFuelRepository, FuelRepository>();
+        services.AddScoped<IModelRepository, ModelRepository>();
+        services.AddScoped<ITransmissionRepository, TransmissionRepository>();
 
         return services;
     }
