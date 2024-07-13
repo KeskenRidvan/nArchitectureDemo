@@ -10,9 +10,14 @@ public static class PersistenceServiceRegistiration
 {
     public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("Eng.nArchitecture"));
+        //services.AddDbContext<BaseDbContext>(options => options.UseInMemoryDatabase("Eng.nArchitecture"));
+        services.AddDbContext<BaseDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("RentACar")));
 
         services.AddScoped<IBrandRepository, BrandRepository>();
+        services.AddScoped<ICarRepository, CarRepository>();
+        services.AddScoped<IFuelRepository, FuelRepository>();
+        services.AddScoped<IModelRepository, ModelRepository>();
+        services.AddScoped<ITransmissionRepository, TransmissionRepository>();
 
         return services;
     }
