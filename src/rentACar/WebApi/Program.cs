@@ -1,4 +1,5 @@
 using Application;
+using Core.CrossCuttingConcerns.Exceptions.Extensions;
 using Persistence;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -23,6 +24,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
         options.DocExpansion(DocExpansion.None));
 }
+
+//if (app.Environment.IsProduction())
+app.ConfigureCustomExceptionMiddleware();
 
 app.UseHttpsRedirection();
 
