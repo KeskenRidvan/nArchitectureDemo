@@ -7,7 +7,7 @@ using Domain.Entities;
 using MediatR;
 
 namespace Application.Features.Brands.Queries.GetList;
-public class GetListBrandQuery : IRequest<GetListResponse<GetListBrandResponseDto>>
+public class GetListBrandQuery : IRequest<GetListResponse<GetListBrandResponseDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
     public class GetListBrandQueryHandler :
