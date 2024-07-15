@@ -13,9 +13,15 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     private readonly IDistributedCache _cache;
     private readonly ILogger<CachingBehavior<TRequest, TResponse>> _logger;
 
-    public CachingBehavior(IDistributedCache cache, ILogger<CachingBehavior<TRequest, TResponse>> logger, IConfiguration configuration)
+    public CachingBehavior(
+        IDistributedCache cache,
+        ILogger<CachingBehavior<TRequest, TResponse>> logger,
+        IConfiguration configuration)
     {
-        _cacheSettings = configuration.GetSection("CacheSettings").Get<CacheSettings>() ?? throw new InvalidOperationException();
+        _cacheSettings = configuration
+            .GetSection("CacheSettings")
+            .Get<CacheSettings>() ?? throw new InvalidOperationException();
+
         _cache = cache;
         _logger = logger;
     }
@@ -45,7 +51,9 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     {
         TResponse response = await next();
 
-        TimeSpan slidingExpiration = request.SlidingExpiration ?? TimeSpan.FromDays(_cacheSettings.SlidingExpiration);
+        TimeSpan slidingExpiration =
+            request.SlidingExpiration ?? TimeSpan.FromDays(_cacheSettings.SlidingExpiration);
+
         DistributedCacheEntryOptions cacheOptions = new()
         {
             SlidingExpiration = slidingExpiration
@@ -56,6 +64,59 @@ public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         await _cache.SetAsync(request.CacheKey, serializedData, cacheOptions, cancellationToken);
         _logger.LogInformation($"Added to Cache -> {request.CacheKey}");
 
+        if (request.CacheGroupKey is not null)
+            await addCacheKeyToGroup(request, slidingExpiration, cancellationToken);
+
         return response;
+    }
+
+    private async Task addCacheKeyToGroup(
+        TRequest request,
+        TimeSpan slidingExpiration,
+        CancellationToken cancellationToken)
+    {
+        byte[]? cacheGroupCache = await _cache.GetAsync(key: request.CacheGroupKey!, cancellationToken);
+        HashSet<string> cacheKeysInGroup;
+        if (cacheGroupCache is not null)
+        {
+            cacheKeysInGroup = JsonSerializer.Deserialize<HashSet<string>>(Encoding.Default.GetString(cacheGroupCache))!;
+            if (!cacheKeysInGroup.Contains(request.CacheKey))
+                cacheKeysInGroup.Add(request.CacheKey);
+        }
+        else
+            cacheKeysInGroup = new HashSet<string>(new[] { request.CacheKey });
+
+        byte[] newCacheGroupCache = JsonSerializer.SerializeToUtf8Bytes(cacheKeysInGroup);
+
+        byte[]? cacheGroupCacheSlidingExpirationCache = await _cache.GetAsync(
+            key: $"{request.CacheGroupKey}SlidingExpiration",
+            cancellationToken);
+
+        int? cacheGroupCacheSlidingExpirationValue = null;
+
+        if (cacheGroupCacheSlidingExpirationCache is not null)
+            cacheGroupCacheSlidingExpirationValue = Convert.ToInt32(Encoding.Default.GetString(cacheGroupCacheSlidingExpirationCache));
+
+        if (cacheGroupCacheSlidingExpirationValue is null || slidingExpiration.TotalSeconds > cacheGroupCacheSlidingExpirationValue)
+            cacheGroupCacheSlidingExpirationValue = Convert.ToInt32(slidingExpiration.TotalSeconds);
+
+        byte[] serializeCachedGroupSlidingExpirationData = JsonSerializer.SerializeToUtf8Bytes(cacheGroupCacheSlidingExpirationValue);
+
+        DistributedCacheEntryOptions cacheOptions = new()
+        {
+            SlidingExpiration = TimeSpan.FromSeconds(Convert.ToDouble(cacheGroupCacheSlidingExpirationValue))
+        };
+
+        await _cache.SetAsync(key: request.CacheGroupKey!, newCacheGroupCache, cacheOptions, cancellationToken);
+
+        _logger.LogInformation($"Added to Cache -> {request.CacheGroupKey}");
+
+        await _cache.SetAsync(
+            key: $"{request.CacheGroupKey}SlidingExpiration",
+            serializeCachedGroupSlidingExpirationData,
+            cacheOptions,
+            cancellationToken);
+
+        _logger.LogInformation($"Added to Cache -> {request.CacheGroupKey}SlidingExpiration");
     }
 }
