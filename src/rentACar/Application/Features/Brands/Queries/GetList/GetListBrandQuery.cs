@@ -1,6 +1,7 @@
 ﻿using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Pipelines.Cachings;
+using Core.Application.Pipelines.Loggings;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Core.Persistence.Paging;
@@ -8,7 +9,7 @@ using Domain.Entities;
 using MediatR;
 
 namespace Application.Features.Brands.Queries.GetList;
-public class GetListBrandQuery : IRequest<GetListResponse<GetListBrandResponseDto>>, ICachableRequest
+public class GetListBrandQuery : IRequest<GetListResponse<GetListBrandResponseDto>>, ICachableRequest, ILoggableRequest
 {
     public PageRequest PageRequest { get; set; }
 
