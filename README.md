@@ -22,4 +22,12 @@
 - Pipeline Writing Techniques
 - Fluent Validation Implementation with Validation Pipeline
 - Transactional Operation Implementation with Transaction Pipeline
+
+## What I learned at the end of the 2,5-hour course-3:
+
+- Caching Pipeline Implementation
+- InMemory Cache Implementation
+- Redis Cache Implementation
+- Logging Pipeline Implementation
+- Serilog Implementation
 <hr/>
