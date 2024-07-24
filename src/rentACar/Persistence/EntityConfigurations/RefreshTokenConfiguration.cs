@@ -1,4 +1,4 @@
-﻿using Core.Security.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,9 +13,9 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.Property(rt => rt.Id).HasColumnName("Id").IsRequired();
         builder.Property(rt => rt.UserId).HasColumnName("UserId").IsRequired();
         builder.Property(rt => rt.Token).HasColumnName("Token").IsRequired();
-        builder.Property(rt => rt.Expires).HasColumnName("Expires").IsRequired();
+        builder.Property(rt => rt.ExpirationDate).HasColumnName("ExpiresDate").IsRequired();
         builder.Property(rt => rt.CreatedByIp).HasColumnName("CreatedByIp").IsRequired();
-        builder.Property(rt => rt.Revoked).HasColumnName("Revoked");
+        builder.Property(rt => rt.RevokedDate).HasColumnName("RevokedDate");
         builder.Property(rt => rt.RevokedByIp).HasColumnName("RevokedByIp");
         builder.Property(rt => rt.ReplacedByToken).HasColumnName("ReplacedByToken");
         builder.Property(rt => rt.ReasonRevoked).HasColumnName("ReasonRevoked");
@@ -27,5 +27,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.HasQueryFilter(rt => !rt.DeletedDate.HasValue);
 
         builder.HasOne(rt => rt.User);
+
+        builder.HasBaseType((string)null!);
     }
 }

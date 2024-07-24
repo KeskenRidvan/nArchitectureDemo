@@ -1,4 +1,4 @@
-﻿using Core.Security.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -18,21 +18,32 @@ public class UserOperationClaimConfiguration : IEntityTypeConfiguration<UserOper
         builder.Property(uoc => uoc.UpdatedDate).HasColumnName("UpdatedDate");
         builder.Property(uoc => uoc.DeletedDate).HasColumnName("DeletedDate");
 
+        builder.HasIndex(indexExpression: u => new
+        {
+            u.UserId,
+            u.OperationClaimId
+        }, name: "UK_UserOperationClaims_UserId_OperationClaimId").IsUnique();
+
         builder.HasQueryFilter(uoc => !uoc.DeletedDate.HasValue);
 
         builder.HasOne(uoc => uoc.User);
         builder.HasOne(uoc => uoc.OperationClaim);
 
-        builder.HasData(getSeeds());
+        builder.HasData(_seeds);
+
+        builder.HasBaseType((string)null!);
     }
 
-    private IEnumerable<UserOperationClaim> getSeeds()
+    private IEnumerable<UserOperationClaim> _seeds
     {
-        List<UserOperationClaim> userOperationClaims = new();
-
-        UserOperationClaim adminUserOperationClaim = new(id: 1, userId: 1, operationClaimId: 1);
-        userOperationClaims.Add(adminUserOperationClaim);
-
-        return userOperationClaims;
+        get
+        {
+            yield return new()
+            {
+                Id = 1,
+                UserId = 1,
+                OperationClaimId = OperationClaimConfiguration.AdminId
+            };
+        }
     }
 }

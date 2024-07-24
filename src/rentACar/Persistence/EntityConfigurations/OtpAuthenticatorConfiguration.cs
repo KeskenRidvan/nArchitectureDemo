@@ -1,4 +1,4 @@
-﻿using Core.Security.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,5 +22,7 @@ public class OtpAuthenticatorConfiguration : IEntityTypeConfiguration<OtpAuthent
         builder.HasQueryFilter(oa => !oa.DeletedDate.HasValue);
 
         builder.HasOne(oa => oa.User);
+
+        builder.HasBaseType((string)null!);
     }
 }

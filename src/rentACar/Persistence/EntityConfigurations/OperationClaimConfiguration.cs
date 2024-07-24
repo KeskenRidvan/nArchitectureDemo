@@ -1,4 +1,9 @@
-﻿using Core.Security.Entities;
+﻿using Application.Features.Auths.Constants;
+using Application.Features.OperationClaims.Constants;
+using Application.Features.UserOperationClaims.Constants;
+using Application.Features.Users.Constants;
+using Core.Security.Constants;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,49 +17,85 @@ public class OperationClaimConfiguration : IEntityTypeConfiguration<OperationCla
 
         builder.Property(oc => oc.Id).HasColumnName("Id").IsRequired();
         builder.Property(oc => oc.Name).HasColumnName("Name").IsRequired();
-
         builder.Property(oc => oc.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(oc => oc.UpdatedDate).HasColumnName("UpdatedDate");
         builder.Property(oc => oc.DeletedDate).HasColumnName("DeletedDate");
 
         builder.HasQueryFilter(oc => !oc.DeletedDate.HasValue);
 
-        builder.HasMany(oc => oc.UserOperationClaims);
+        builder.HasData(_seeds);
 
-        //builder.HasData(_seeds);
+        builder.HasBaseType((string)null!);
     }
 
-    //private IEnumerable<OperationClaim> _seeds
-    //{
-    //    get
-    //    {
-    //        int id = 0;
+    public static int AdminId => 1;
+    private IEnumerable<OperationClaim> _seeds
+    {
+        get
+        {
+            yield return new() { Id = AdminId, Name = GeneralOperationClaims.Admin };
 
-    //        yield return new OperationClaim { Id = ++id, Name = GeneralOperationClaims.Admin };
+            IEnumerable<OperationClaim> featureOperationClaims = getFeatureOperationClaims(AdminId);
+            foreach (OperationClaim claim in featureOperationClaims)
+                yield return claim;
+        }
+    }
+    private IEnumerable<OperationClaim> getFeatureOperationClaims(int initialId)
+    {
+        int lastId = initialId;
+        List<OperationClaim> featureOperationClaims = new();
 
-    //        #region Feature Operation Claims
-    //        IEnumerable<Type> featureOperationClaimsTypes = Assembly
-    //            .GetAssembly(typeof(ApplicationServiceRegistration))!
-    //            .GetTypes()
-    //            .Where(
-    //                type =>
-    //                    (type.Namespace?.Contains("Features") == true)
-    //                    && (type.Namespace?.Contains("Constants") == true)
-    //                    && type.IsClass
-    //                    && type.Name.EndsWith("OperationClaims")
-    //            );
-    //        foreach (Type type in featureOperationClaimsTypes)
-    //        {
-    //            FieldInfo[] typeFields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
-    //            IEnumerable<string> typeFieldsValues = typeFields.Select(field => field.GetValue(null)!.ToString()!);
+        #region Auth
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = AuthOperationClaims.Admin },
+                new() { Id = ++lastId, Name = AuthOperationClaims.Read },
+                new() { Id = ++lastId, Name = AuthOperationClaims.Write },
+                new() { Id = ++lastId, Name = AuthOperationClaims.RevokeToken },
+            ]
+        );
+        #endregion
 
-    //            IEnumerable<OperationClaim> featureOperationClaimsToAdd = typeFieldsValues.Select(
-    //                value => new OperationClaim { Id = ++id, Name = value }
-    //            );
-    //            foreach (OperationClaim featureOperationClaim in featureOperationClaimsToAdd)
-    //                yield return featureOperationClaim;
-    //        }
-    //        #endregion
-    //    }
-    //}
+        #region OperationClaims
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = OperationClaimsOperationClaims.Admin },
+                new() { Id = ++lastId, Name = OperationClaimsOperationClaims.Read },
+                new() { Id = ++lastId, Name = OperationClaimsOperationClaims.Write },
+                new() { Id = ++lastId, Name = OperationClaimsOperationClaims.Create },
+                new() { Id = ++lastId, Name = OperationClaimsOperationClaims.Update },
+                new() { Id = ++lastId, Name = OperationClaimsOperationClaims.Delete },
+            ]
+        );
+        #endregion
+
+        #region UserOperationClaims
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = UserOperationClaimsOperationClaims.Admin },
+                new() { Id = ++lastId, Name = UserOperationClaimsOperationClaims.Read },
+                new() { Id = ++lastId, Name = UserOperationClaimsOperationClaims.Write },
+                new() { Id = ++lastId, Name = UserOperationClaimsOperationClaims.Create },
+                new() { Id = ++lastId, Name = UserOperationClaimsOperationClaims.Update },
+                new() { Id = ++lastId, Name = UserOperationClaimsOperationClaims.Delete },
+            ]
+        );
+        #endregion
+
+        #region Users
+        featureOperationClaims.AddRange(
+            [
+                new() { Id = ++lastId, Name = UsersOperationClaims.Admin },
+                new() { Id = ++lastId, Name = UsersOperationClaims.Read },
+                new() { Id = ++lastId, Name = UsersOperationClaims.Write },
+                new() { Id = ++lastId, Name = UsersOperationClaims.Create },
+                new() { Id = ++lastId, Name = UsersOperationClaims.Update },
+                new() { Id = ++lastId, Name = UsersOperationClaims.Delete },
+            ]
+        );
+        #endregion
+
+        return featureOperationClaims;
+
+    }
 }

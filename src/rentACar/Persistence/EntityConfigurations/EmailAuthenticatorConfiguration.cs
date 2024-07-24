@@ -1,4 +1,4 @@
-﻿using Core.Security.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,5 +22,7 @@ public class EmailAuthenticatorConfiguration : IEntityTypeConfiguration<EmailAut
         builder.HasQueryFilter(ea => !ea.DeletedDate.HasValue);
 
         builder.HasOne(ea => ea.User);
+
+        builder.HasBaseType((string)null!);
     }
 }

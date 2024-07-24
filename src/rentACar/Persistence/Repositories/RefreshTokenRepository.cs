@@ -1,6 +1,6 @@
 ﻿using Application.Services.Repositories;
 using Core.Persistence.Repositories;
-using Core.Security.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 
@@ -10,15 +10,15 @@ public class RefreshTokenRepository : EfRepositoryBase<RefreshToken, int, BaseDb
 {
     public RefreshTokenRepository(BaseDbContext context) : base(context) { }
 
-    public async Task<List<RefreshToken>> GetOldRefreshTokensAsync(int userID, int refreshTokenTTL)
+    public async Task<List<RefreshToken>> GetOldRefreshTokensAsync(int userId, int refreshTokenTtl)
     {
-        List<RefreshToken> tokens =
-            await Query().AsNoTracking()
+        List<RefreshToken> tokens = await Query()
+            .AsNoTracking()
             .Where(r =>
-                r.UserId.Equals(userID)
-                && r.Revoked.Equals(null)
-                && r.Expires >= DateTime.UtcNow
-                && r.CreatedDate.AddDays(refreshTokenTTL) <= DateTime.UtcNow
+                r.UserId.Equals(userId)
+                && r.RevokedDate.Equals(null)
+                && r.ExpirationDate >= DateTime.UtcNow
+                && r.CreatedDate.AddDays(refreshTokenTtl) <= DateTime.UtcNow
             ).ToListAsync();
 
         return tokens;
