@@ -30,4 +30,8 @@
 - Redis Cache Implementation
 - Logging Pipeline Implementation
 - Serilog Implementation
-<hr/>
+
+## What I learned at the end of the 2,5-hour course-4:
+
+- Security and JWT Implementation
+- Mailing Implementation
