@@ -19,6 +19,13 @@ public static class PersistenceServiceRegistiration
         services.AddScoped<IModelRepository, ModelRepository>();
         services.AddScoped<ITransmissionRepository, TransmissionRepository>();
 
+        services.AddScoped<IOperationClaimRepository, OperationClaimRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserOperationClaimRepository, UserOperationClaimRepository>();
+        services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();
+        services.AddScoped<IOtpAuthenticatorRepository, OtpAuthenticatorRepository>();
+
         return services;
     }
 }
